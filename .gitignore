@@ -1,4 +1,6 @@
-syntax: glob
+build
+.ccls-cache
+ext/ramulator
 build
 parser.out
 parsetab.py
@@ -10,6 +12,5 @@ cscope.out
 m5out
 src/doxygen
 ext/dramsim2/DRAMSim2
-ext/ramulator/Ramulator
-build
-.ccls-cache
+clang.sh
+scon.log

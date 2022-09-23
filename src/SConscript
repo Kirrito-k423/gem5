@@ -919,6 +919,11 @@ def makeEnv(env, label, objsfx, strip = False, **kwargs):
     # Add additional warnings here that should not be applied to
     # the SWIG generated code
     new_env.Append(CXXFLAGS='-Wmissing-declarations')
+    new_env.Append(CXXFLAGS='-DPROTOBUF_INLINE_NOT_IN_HEADERS=0')
+    new_env.Append(CXXFLAGS='-g')
+    # new_env.Append(LIBS=['-lprotobuf'])
+    # lib = File('/usr/local/lib/libprotobuf.a')
+    # new_env.Append(LIBS=[lib])
 
     if env['GCC']:
         # Depending on the SWIG version, we also need to supress

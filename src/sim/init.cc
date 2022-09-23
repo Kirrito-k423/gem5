@@ -269,8 +269,8 @@ initM5Python()
  * by unit tests to specify a different python main function.
  */
 const char * __attribute__((weak)) m5MainCommands[] = {
-    "import m5",
-    "m5.main()",
+    "from m5.main import main",
+    "main()",
     0 // sentinel is required
 };
 

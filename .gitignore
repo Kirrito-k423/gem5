@@ -1,6 +1,5 @@
 build
 .ccls-cache
-ext/ramulator
 build
 parser.out
 parsetab.py

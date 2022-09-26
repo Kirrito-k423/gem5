@@ -564,8 +564,12 @@ class Request
     int
     contextId() const
     {
-        assert(privateFlags.isSet(VALID_CONTEXT_ID));
-        return _contextId;
+        /* assert(privateFlags.isSet(VALID_CONTEXT_ID)); */
+        if (privateFlags.isSet(VALID_CONTEXT_ID))
+            return _contextId;
+        else
+            return 0;
+        /* return _contextId; */
     }
 
     /** Accessor function for thread ID. */

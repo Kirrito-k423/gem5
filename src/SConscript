@@ -922,9 +922,11 @@ def makeEnv(env, label, objsfx, strip = False, **kwargs):
     new_env.Append(CXXFLAGS='-DPROTOBUF_INLINE_NOT_IN_HEADERS=0')
     new_env.Append(CXXFLAGS='-g')
     # new_env.Append(LIBS=['-lprotobuf'])
-    # lib = File('/usr/local/lib/libprotobuf.a')
-    # new_env.Append(LIBS=[lib])
-
+    lib = File('/staff/shaojiemike/Install/protobuf-2.4.1/lib/libprotobuf.a')
+    new_env.Append(LIBS=[lib])
+    new_env.Append( CPPPATH=['/staff/shaojiemike/Install/protobuf-2.4.1/include'])
+    if '/usr/local/include' in new_env['CPPPATH']:
+        new_env['CPPPATH'].remove('/usr/local/include')
     if env['GCC']:
         # Depending on the SWIG version, we also need to supress
         # warnings about uninitialized variables and missing field

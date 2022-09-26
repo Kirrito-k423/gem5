@@ -13,3 +13,4 @@ src/doxygen
 ext/dramsim2/DRAMSim2
 clang.sh
 scon.log
+local_header_backup

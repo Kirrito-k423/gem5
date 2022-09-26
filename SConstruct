@@ -556,8 +556,11 @@ if main['GCC'] or main['CLANG']:
     # main.Append(CXXFLAGS=['-std=c++0x'])
     main.Append(CXXFLAGS=['-std=c++11','-g','-DPROTOBUF_INLINE_NOT_IN_HEADERS=0'])
     # main.Append(LIBS=['-lprotobuf'])
-    # lib = File('/usr/local/lib/libprotobuf.a')
-    # main.Append(LIBS=[lib])
+    lib = File('/staff/shaojiemike/Install/protobuf-2.4.1/lib/libprotobuf.a')
+    main.Append(LIBS=[lib])
+    main.Append( CPPPATH=['/staff/shaojiemike/Install/protobuf-2.4.1/include'])
+    if '/usr/local/include' in main['CPPPATH']:
+                 main['CPPPATH'].remove('/usr/local/include')
     # Add selected sanity checks from -Wextra
     main.Append(CXXFLAGS=['-Wmissing-field-initializers',
                           '-Woverloaded-virtual'])

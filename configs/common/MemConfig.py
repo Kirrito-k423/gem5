@@ -62,8 +62,13 @@ def create_mem_intf(intf, r, i, intlv_bits, intlv_size,
     # mapping and row-buffer size
     interface = intf()
 
+    if issubclass(intf, m5.objects.Ramulator):
+        if not options.ramulator_config:
+            fatal("--mem-type=ramulator require --ramulator-config option")
+        ctrl.config_file = options.ramulator_config
+        ctrl.num_cpus = options.num_cpus
     # Only do this for DRAMs
-    if issubclass(intf, m5.objects.DRAMInterface):
+    elif issubclass(intf, m5.objects.DRAMInterface):
         # If the channel bits are appearing after the column
         # bits, we need to add the appropriate number of bits
         # for the row buffer size

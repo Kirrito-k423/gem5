@@ -1,6 +1,6 @@
 # -*- mode:python -*-
 from m5.params import *
-from AbstractMemory import *
+from m5.objects.AbstractMemory import *
 
 # A wrapper for Ramulator multi-channel memory controller
 class Ramulator(AbstractMemory):

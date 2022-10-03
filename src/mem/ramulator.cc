@@ -64,7 +64,7 @@ unsigned int Ramulator::drain(DrainManager* dm) {
     }
 }
 
-BaseSlavePort& Ramulator::getSlavePort
+SlavePort& Ramulator::getSlavePort
                 (const std::string& if_name, PortID idx) {
     if (if_name != "port") {
         return MemObject::getSlavePort(if_name, idx);

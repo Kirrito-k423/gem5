@@ -13,7 +13,11 @@ namespace ramulator{
     class Request;
     class Gem5Wrapper;
 }
+namespace gem5
+{
 
+namespace memory
+{
 class Ramulator : public AbstractMemory
 {
 private:
@@ -83,7 +87,7 @@ public:
     virtual void init();
     virtual void startup();
     unsigned int drain(DrainManager* dm);
-    virtual BaseSlavePort& getSlavePort(const std::string& if_name,
+    virtual SlavePort& getSlavePort(const std::string& if_name,
         PortID idx = InvalidPortID);
     ~Ramulator();
 protected:
@@ -96,4 +100,6 @@ protected:
     void writeComplete(ramulator::Request& req);
 };
 
+} // namespace memory
+} // namespace gem5
 #endif // __RAMULATOR_HH__

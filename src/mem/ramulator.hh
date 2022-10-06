@@ -22,13 +22,14 @@ class Ramulator : public AbstractMemory
 {
 private:
 
-    class TestPort: public SlavePort
+    class TestPort: public ResponsePort
     {
     private:
         Ramulator& mem;
     public:
-        TestPort(const std::string& _name, Ramulator& _mem):
-                        SlavePort(_name, &_mem), mem(_mem) {}
+        TestPort(const std::string& _name, Ramulator& _mem,
+                PortID id=InvalidPortID):
+                    ResponsePort(_name, &_mem, id), mem(_mem) {}
     protected:
         Tick recvAtomic(PacketPtr pkt) {
             // modified to perform a fixed latency
@@ -83,11 +84,11 @@ private:
 
 public:
     typedef RamulatorParams Params;
-    Ramulator(const Params *p);
+    Ramulator(const Params &p);
     virtual void init();
     virtual void startup();
     unsigned int drain(DrainManager* dm);
-    virtual SlavePort& getSlavePort(const std::string& if_name,
+    virtual Port& getPort(const std::string& if_name,
         PortID idx = InvalidPortID);
     ~Ramulator();
 protected:

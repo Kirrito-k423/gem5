@@ -6,7 +6,7 @@ from m5.objects.AbstractMemory import *
 class Ramulator(AbstractMemory):
     type = 'Ramulator'
     cxx_header = "mem/ramulator.hh"
-
+    cxx_class = 'gem5::memory::Ramulator'
     # A single port for now
     port = SlavePort("Slave port")
 

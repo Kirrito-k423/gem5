@@ -6,12 +6,20 @@
 #include "debug/Ramulator.hh"
 #include "sim/system.hh"
 
-Ramulator::Ramulator(const Params* p) : AbstractMemory(p),
+#define DPRINTF(x, ...) do {} while (0)
+
+namespace gem5
+{
+
+namespace memory
+{
+Ramulator::Ramulator(const Params &p) :
+        AbstractMemory(p),
         port(name() + ".port", *this),
         requestsInFlight(0),
         drain_manager(NULL),
-        config_file(p->config_file),
-        configs(p->config_file),
+        config_file(p.config_file),
+        configs(p.config_file),
         wrapper(NULL),
         read_cb_func(std::bind(&Ramulator::readComplete,
                                                 this, std::placeholders::_1)),
@@ -22,13 +30,15 @@ Ramulator::Ramulator(const Params* p) : AbstractMemory(p),
         req_stall(false),
         send_resp_event(this),
         tick_event(this) {
-    configs.set_core_num(p->num_cpus);
+    configs.set_core_num(p.num_cpus);
 }
 Ramulator::~Ramulator() {
     delete wrapper;
 }
 
 void Ramulator::init() {
+    // AbstractMemory::init();
+
     if (!port.isConnected()) {
         fatal("Ramulator port not connected\n");
     } else {
@@ -38,12 +48,13 @@ void Ramulator::init() {
     ticks_per_clk = Tick(wrapper->tCK * SimClock::Float::ns);
 
     DPRINTF(Ramulator,
-                        "Instantiated Ramulator with config file
-                        '%s' (tCK=%lf, %d ticks per clk)\n",
+    "Instantiated Ramulator with config file '%s' \
+    (tCK=%lf, %d ticks per clk)\n",
             config_file.c_str(), wrapper->tCK, ticks_per_clk);
-    Callback* cb = new MakeCallback<ramulator::Gem5Wrapper,
-                        &ramulator::Gem5Wrapper::finish>(wrapper);
-    registerExitCallback(cb);
+    //callback was deleted
+    // Callback* cb = new MakeCallback<ramulator::Gem5Wrapper,
+    //                     &ramulator::Gem5Wrapper::finish>(wrapper);
+    registerExitCallback([this]() {wrapper->finish();});
 }
 
 void Ramulator::startup() {
@@ -55,16 +66,16 @@ unsigned int Ramulator::drain(DrainManager* dm) {
     // updated to include all in-flight requests
     // if (resp_queue.size()) {
     if (numOutstanding()) {
-        setDrainState(Drainable::Draining);
+        setDrainState(DrainState::Draining);
         drain_manager = dm;
         return 1;
     } else {
-        setDrainState(Drainable::Drained);
+        setDrainState(DrainState::Drained);
         return 0;
     }
 }
 
-SlavePort& Ramulator::getSlavePort
+Port& Ramulator::getPort
                 (const std::string& if_name, PortID idx) {
     if (if_name != "port") {
         return MemObject::getSlavePort(if_name, idx);
@@ -232,3 +243,6 @@ void Ramulator::writeComplete(ramulator::Request& req) {
 Ramulator* RamulatorParams::create() {
     return new Ramulator(this);
 }
+} // namespace memory
+} // namespace gem5
+

@@ -46,7 +46,7 @@ private:
             return mem.recvTimingReq(pkt);
         }
 
-        void recvRetry() {
+        void recvRespRetry() {
             mem.recvRetry();
         }
 
@@ -84,7 +84,7 @@ private:
 
 public:
     typedef RamulatorParams Params;
-    Ramulator(const Params &p);
+    Ramulator(const Params *p);
     virtual void init();
     virtual void startup();
     unsigned int drain(DrainManager* dm);

@@ -13,13 +13,13 @@ namespace gem5
 
 namespace memory
 {
-Ramulator::Ramulator(const Params &p) :
-        AbstractMemory(p),
+Ramulator::Ramulator(const Params *p) :
+        AbstractMemory(*p),
         port(name() + ".port", *this),
         requestsInFlight(0),
         drain_manager(NULL),
-        config_file(p.config_file),
-        configs(p.config_file),
+        config_file(p->config_file),
+        configs(p->config_file),
         wrapper(NULL),
         read_cb_func(std::bind(&Ramulator::readComplete,
                                                 this, std::placeholders::_1)),
@@ -30,7 +30,7 @@ Ramulator::Ramulator(const Params &p) :
         req_stall(false),
         send_resp_event(this),
         tick_event(this) {
-    configs.set_core_num(p.num_cpus);
+    configs.set_core_num(p->num_cpus);
 }
 Ramulator::~Ramulator() {
     delete wrapper;
@@ -78,7 +78,7 @@ unsigned int Ramulator::drain(DrainManager* dm) {
 Port& Ramulator::getPort
                 (const std::string& if_name, PortID idx) {
     if (if_name != "port") {
-        return MemObject::getSlavePort(if_name, idx);
+        return ClockedObject::getPort(if_name, idx);
     } else {
         return port;
     }
@@ -110,7 +110,7 @@ void Ramulator::tick() {
     wrapper->tick();
     if (req_stall) {
         req_stall = false;
-        port.sendRetry();
+        port.sendRetryReq();
     }
     schedule(tick_event, curTick() + ticks_per_clk);
 }
@@ -120,14 +120,14 @@ Tick Ramulator::recvAtomic(PacketPtr pkt) {
     access(pkt);
 
     // set an fixed arbitrary 50ns response time for atomic requests
-    return pkt->memInhibitAsserted() ? 0 : 50000;
+    return pkt->cacheResponding() ? 0 : 50000;
 }
 
 void Ramulator::recvFunctional(PacketPtr pkt) {
     pkt->pushLabel(name());
     functionalAccess(pkt);
     for (auto i = resp_queue.begin(); i != resp_queue.end(); ++i)
-        pkt->checkFunctional(*i);
+        pkt->trySatisfyFunctional(*i);
     pkt->popLabel();
 }
 
@@ -139,7 +139,7 @@ bool Ramulator::recvTimingReq(PacketPtr pkt) {
         delete pendPkt;
     pending_del.clear();
 
-    if (pkt->memInhibitAsserted()) {
+    if (pkt->cacheResponding()) {
         // snooper will supply based on copy of packet
         // still target's responsibility to delete packet
         pending_del.push_back(pkt);
@@ -148,7 +148,7 @@ bool Ramulator::recvTimingReq(PacketPtr pkt) {
 
     bool accepted = true;
     if (pkt->isRead()) {
-        DPRINTF(Ramulator, "context id: %d, thread id:
+        DPRINTF(Ramulator, "context id: %d, thread id:\
                                  %d\n", pkt->req->contextId(),
                 pkt->req->threadId());
         ramulator::Request req(pkt->getAddr(),
@@ -173,7 +173,7 @@ bool Ramulator::recvTimingReq(PacketPtr pkt) {
         accepted = wrapper->send(req);
         if (accepted) {
             accessAndRespond(pkt);
-            DPRINTF(Ramulator, "Write to %ld accepted
+            DPRINTF(Ramulator, "Write to %ld accepted\
                                 and served.\n", req.addr);
 
             // added counter to track requests in flight
@@ -201,7 +201,7 @@ void Ramulator::accessAndRespond(PacketPtr pkt) {
     access(pkt);
     if (need_resp) {
         assert(pkt->isResponse());
-        pkt->busFirstWordDelay = pkt->busLastWordDelay = 0;
+        pkt->headerDelay = pkt->payloadDelay = 0;
 
         DPRINTF(Ramulator, "Queuing response for address %lld\n",
                 pkt->getAddr());
@@ -240,9 +240,11 @@ void Ramulator::writeComplete(ramulator::Request& req) {
     }
 }
 
-Ramulator* RamulatorParams::create() {
-    return new Ramulator(this);
-}
+
 } // namespace memory
 } // namespace gem5
+
+gem5::memory::Ramulator* gem5::RamulatorParams::create() const{
+    return new gem5::memory::Ramulator(this);
+}
 

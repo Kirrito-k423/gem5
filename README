@@ -1,3 +1,13 @@
+# new gem5 patched with new ramulator
+
+all you need to pass compile is
+```
+export C=clang
+export C++=clang++
+scons build/X86/gem5.fast --debug=presub --verbose -j 32 2>&1| tee scons.log
+```
+
+## Old gem5 README
 This is the gem5 simulator.
 
 The main website can be found at http://www.gem5.org

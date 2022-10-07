@@ -12,3 +12,7 @@ class Ramulator(AbstractMemory):
 
     config_file = Param.String("", "configuration file")
     num_cpus = Param.Unsigned(1, "Number of cpu")
+
+    def controller(self):
+        # src/mem/DRAMInterface.py have control MemCtrl example to reference
+        return self

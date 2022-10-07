@@ -37,6 +37,9 @@ dramenv = env.Clone()
 dramenv.Append(CXXFLAGS=['-Wno-missing-field-initializers'])
 dramenv.Append(CXXFLAGS=['-Wno-unused-variable'])
 dramenv.Append(CXXFLAGS=['-Wno-reorder'])
+dramenv.Append(CXXFLAGS=['-Isrc'])
+dramenv.Append(CXXFLAGS=['-Ibuild/X86'])
+
 
 # added support to hook in gem5 headers
 dramenv.Append(CPPPATH = Dir('../../src/'))
